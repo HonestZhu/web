@@ -15,15 +15,7 @@ import Menu from "./components/Menu.vue";
 </script>
 
 <style scoped>
-/* .scale-enter-active,
-.scale-leave-active {
-  transition: transform 0.3s;
-}
 
-.scale-enter-from,
-.scale-leave-to {
-transform: scale(0);
-} */
 
 .fade-enter-active,
 .fade-leave-active {
