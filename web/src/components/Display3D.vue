@@ -37,7 +37,6 @@ import { ref, getCurrentInstance, onMounted, defineExpose } from "vue";
 import axios from "axios";
 
 let pdbUri = "../../public/data/1AKI_clean.pdb";
-let view = ref(null);
 
 const handleSelect = (name) => {
   // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
@@ -82,17 +81,17 @@ const render = (options) => {
   axios
     .get(pdbUri)
     .then((response) => {
-      console.log(view.value);
-      view.value.addModel(response.data, "pdb"); /* load data */
-      view.value.setBackgroundColor('#E4E5EA');
-      view.value.container.style.borderRadius = '10%';
+      let v = $3Dmol.createViewer(document.getElementsByClassName("mol-container")[0]);
+      v.addModel(response.data, "pdb"); /* load data */
+      v.setBackgroundColor('#E4E5EA');
+      v.container.style.borderRadius = '10%';
       // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
-      view.value.setStyle({}, options); /* style all atoms */
+      v.setStyle({}, options); /* style all atoms */
       // v.container.style.width = '500px';
       // v.container.style.height = '500px';
-      view.value.zoomTo(); /* set camera */
-      view.value.render(); /* render scene */
-      view.value.zoom(1.1, 500); /* slight zoom */
+      v.zoomTo(); /* set camera */
+      v.render(); /* render scene */
+      v.zoom(1.1, 500); /* slight zoom */
     })
     .catch(function (error) {
       console.log(error);
@@ -100,7 +99,6 @@ const render = (options) => {
 }
 
 onMounted(() => {
-  view.value = ref($3Dmol.createViewer(document.getElementsByClassName("mol-container")[0]))
   render({ stick: { color: "spectrum" } })
 })
 

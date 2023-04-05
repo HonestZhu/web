@@ -4,16 +4,19 @@
 import Display3D from "../components/Display3D.vue";
 </script>
 <template>
-<div class=''>
-    <Display3D></Display3D>
+<div class='root'>
+    <Display3D class="display"></Display3D>
 </div>
 </template>
 
 
 <style scoped>
-.mol-container {
-  width:    75%;
-  height:   400px;
-  position: relative;
+.root {
+  height: 100vh;
+}
+
+.display {
+  width: 60vw;
+  height: 50vh;
 }
 </style>

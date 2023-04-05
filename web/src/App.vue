@@ -15,8 +15,6 @@ import Menu from "./components/Menu.vue";
 </script>
 
 <style scoped>
-
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease;
@@ -25,5 +23,15 @@ import Menu from "./components/Menu.vue";
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.root {
+  width: 100vw;
+  overflow: hidden;
+  padding-right: calc(100vw - 100%);
 }
 </style>
