@@ -7,9 +7,9 @@
           <a-col :span="4">
             <div>3D分子模型</div>
           </a-col>
-          <a-col :span="3">
+          <a-col :span="2">
             <a-dropdown @select="handleSelect" :popup-max-height="false">
-              <a-button size="small" class="btn"><icon-down />外观</a-button>
+              <a-button size="small" class="btn"><icon-skin />外观</a-button>
               <template #content>
                 <!-- // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点 -->
                 <a-doption>粘性键</a-doption>
@@ -20,15 +20,27 @@
               </template>
             </a-dropdown>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="2">
+            <a-dropdown @select="handleSelectColor" :popup-max-height="false">
+              <a-button size="small" class="btn"><icon-brush />背景</a-button>
+              <template #content>
+                <!-- // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点 -->
+                <a-doption>默认</a-doption>
+                <a-doption>黑色</a-doption>
+                <a-doption>白色</a-doption>
+                <a-doption>浅蓝色</a-doption>
+                <a-doption>浅绿色</a-doption>
+              </template>
+            </a-dropdown>
+          </a-col>
+          <a-col :span="3">
             <a-button size="small" ref="download" class="btn" @click="getPng"><icon-file-image />导出PNG</a-button>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="3">
             <a-button size="small" ref="download" class="btn" @click="getPdb"><icon-cloud-download />导出PDB</a-button>
           </a-col>
-          <a-col :span="1"></a-col>
-
-          <a-col :span="8">{{ name }} - {{ style }}</a-col>
+          <a-col :span="4"></a-col>
+          <a-col :span="6">{{ name }} - {{ style }}</a-col>
         </a-row>
       </a-space>
     </div>
@@ -43,6 +55,7 @@
 import * as $3Dmol from "3dmol";
 import FileSaver from 'file-saver';
 import { ref, getCurrentInstance, onMounted, defineExpose } from "vue";
+import SelectColor from "./SelectColor.vue";
 import axios from "axios";
 
 let pdbUri = "../../public/data/1AKI_clean.pdb";
@@ -52,6 +65,10 @@ let style = ref('粘性键');
 let hasPdb = ref(false);
 let pdb = ref('');
 let download = ref(null);
+
+const visible = ref(false);
+const selectedColor = ref('#000000');
+
 
 const handleSelect = (name) => {
   // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
@@ -75,16 +92,35 @@ const handleSelect = (name) => {
   }
 };
 
-const getPng = () => {
-  downloadImage(viewer.value.pngURI(), name.value + '-' + style.value + '.png');
+const handleSelectColor = (name) => {
+  let v = viewer.value;
+  switch (name) {
+    case '默认':
+      v.setBackgroundColor('#E4E5EA');
+      break;
+    case '黑色':
+      v.setBackgroundColor('black');
+      break;
+    case '白色':
+      v.setBackgroundColor('white');
+      break;
+    case '浅蓝色':
+      v.setBackgroundColor('#2D6DFF');
+      break;
+    case '浅绿色':
+      v.setBackgroundColor('#6AEFC5');
+      break;
+  }
 }
 
+const getPng = () => {
+  downloadImage(viewer.value.pngURI(), name.value + '-' + style.value + '.png');
+};
 const getPdb = () => {
   if (hasPdb.value == true) {
     downloadPdb(pdb.value, name.value + '-' + style.value + '.pdb')
   }
-}
-
+};
 const downloadImage = (base64String, filename) => {
   const byteCharacters = atob(base64String.split(',')[1]);
   const byteNumbers = new Array(byteCharacters.length);
@@ -95,14 +131,14 @@ const downloadImage = (base64String, filename) => {
   const blob = new Blob([byteArray], { type: 'image/png' });
   FileSaver.saveAs(blob, filename);
 };
-
 const downloadPdb = (pdbString, name) => {
   const blob = new Blob([pdbString], { type: 'text/plain;charset=utf-8' });
   FileSaver.saveAs(blob, name);
 };
 
 defineExpose({
-  handleSelect
+  handleSelect,
+  handleSelectColor
 })
 
 /**
@@ -166,14 +202,15 @@ onMounted(() => {
   font-weight: bold;
   background-color: rgba(22, 93, 255, 0.9);
   color: rgb(239, 235, 235);
+  overflow: hidden;
 }
 
 .btn {
+  padding: 10px;
   border-radius: 10px;
-  background-color: rgb(239, 235, 235);
+  background-color: #E4E5EA;
   font-weight: bold;
-  font-size: 1em;
-  letter-spacing: 0.05em;
+  font-size: 0.9em;
 }
 
 .mol-container {
