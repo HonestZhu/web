@@ -28,8 +28,6 @@
                 <a-doption>默认</a-doption>
                 <a-doption>黑色</a-doption>
                 <a-doption>白色</a-doption>
-                <a-doption>浅蓝色</a-doption>
-                <a-doption>浅绿色</a-doption>
               </template>
             </a-dropdown>
           </a-col>
@@ -68,6 +66,7 @@ let download = ref(null);
 
 const visible = ref(false);
 const selectedColor = ref('#000000');
+const color = ref('#E4E5EA');
 
 
 const handleSelect = (name) => {
@@ -96,21 +95,16 @@ const handleSelectColor = (name) => {
   let v = viewer.value;
   switch (name) {
     case '默认':
-      v.setBackgroundColor('#E4E5EA');
+      color.value = '#E4E5EA';
       break;
     case '黑色':
-      v.setBackgroundColor('black');
+      color.value = 'black';
       break;
     case '白色':
-      v.setBackgroundColor('white');
-      break;
-    case '浅蓝色':
-      v.setBackgroundColor('#2D6DFF');
-      break;
-    case '浅绿色':
-      v.setBackgroundColor('#6AEFC5');
+      color.value = 'white';
       break;
   }
+  v.setBackgroundColor(color.value);
 }
 
 const getPng = () => {
@@ -170,6 +164,7 @@ const render = (v, options) => {
       v.container.style.height = `calc(90% - 5px)`;
       v.zoomTo(); /* set camera */
       v.render(); /* render scene */
+      v.setBackgroundColor(color.value);
       v.zoom(1.1, 500); /* slight zoom */
     })
     .catch(function (error) {

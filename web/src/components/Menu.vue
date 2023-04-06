@@ -57,7 +57,6 @@ a {
   letter-spacing: 0.05em;
   font-family: Microsoft JhengHei;
   font-weight: bold;
-  overflow-x: hidden;
 }
 
 .menu-inner {

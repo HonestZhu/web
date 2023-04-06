@@ -31,6 +31,7 @@ html {
 }
 .root {
   width: 100vw;
+  margin: 0;
   overflow: hidden;
   padding-right: calc(100vw - 100%);
 }

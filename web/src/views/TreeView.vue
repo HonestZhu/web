@@ -8,7 +8,6 @@ import SelectColor from "../components/SelectColor.vue";
 <template>
   <div class='root'>
     <Display3D class="display"></Display3D>
-    <!-- <SelectColor></SelectColor> -->
   </div>
 </template>
 
@@ -17,6 +16,7 @@ import SelectColor from "../components/SelectColor.vue";
 .root {
   height: 100%;
   width: 100%;
+  
 }
 
 .display {

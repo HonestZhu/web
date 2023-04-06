@@ -46,7 +46,7 @@ const titles = ["xxx", "xxx", "xxx"];
 <style scoped>
 .carousel {
   width: 80vw;
-  height: 32vw;
+  height: 60vh;
   margin: 0 auto;
 }
 
