@@ -12,11 +12,12 @@ import Display3D from "../components/Display3D.vue";
 
 <style scoped>
 .root {
-  height: 100vh;
+  height: 100%;
+  width: 100%;
 }
 
 .display {
-  width: 60vw;
-  height: 50vh;
+  width: 800px;
+  height: 600px;
 }
 </style>

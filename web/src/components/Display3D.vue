@@ -2,14 +2,14 @@
 <template>
   <div class="root">
     <div>
-      <a-space direction="vertical" :size="16" style="display: block;">
-        <a-row class="head">
+      <a-space class="head" direction="vertical">
+        <a-row>
           <a-col :span="4">
             <div>3D分子模型</div>
           </a-col>
-          <a-col :span="4">
+          <a-col :span="3">
             <a-dropdown @select="handleSelect" :popup-max-height="false">
-              <a-button>外观<icon-down /></a-button>
+              <a-button size="small" class="btn"><icon-down />外观</a-button>
               <template #content>
                 <!-- // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点 -->
                 <a-doption>粘性键</a-doption>
@@ -17,10 +17,18 @@
                 <a-doption>卡通</a-doption>
                 <a-doption>线</a-doption>
                 <a-doption>十字形</a-doption>
-                <a-doption>点</a-doption>
               </template>
             </a-dropdown>
           </a-col>
+          <a-col :span="4">
+            <a-button size="small" ref="download" class="btn" @click="getPng"><icon-file-image />导出PNG</a-button>
+          </a-col>
+          <a-col :span="4">
+            <a-button size="small" ref="download" class="btn" @click="getPdb"><icon-cloud-download />导出PDB</a-button>
+          </a-col>
+          <a-col :span="1"></a-col>
+
+          <a-col :span="8">{{ name }} - {{ style }}</a-col>
         </a-row>
       </a-space>
     </div>
@@ -33,31 +41,65 @@
 
 <script setup>
 import * as $3Dmol from "3dmol";
+import FileSaver from 'file-saver';
 import { ref, getCurrentInstance, onMounted, defineExpose } from "vue";
 import axios from "axios";
 
 let pdbUri = "../../public/data/1AKI_clean.pdb";
+const viewer = ref(null);
+let name = ref('1AKI_clean.pdb');
+let style = ref('粘性键');
+let hasPdb = ref(false);
+let pdb = ref('');
+let download = ref(null);
 
 const handleSelect = (name) => {
   // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
+  style.value = name;
   switch (name) {
     case '粘性键':
-      render({ stick: { color: "sphere" } });
+      render(viewer.value, { stick: { color: "spectrum" } });
       break;
     case '球形':
-      render({ stick: { color: "cartoon" } });
+      render(viewer.value, { sphere: { color: "spectrum" } });
       break;
     case '卡通':
-      render({ stick: { color: "line" } });
+      render(viewer.value, { cartoon: { color: "spectrum" } });
       break;
     case '线':
-      render({ stick: { color: "cross" } });
+      render(viewer.value, { line: { color: "spectrum" } });
       break;
     case '十字形':
-      render({ stick: { color: "dot" } });
+      render(viewer.value, { cross: { color: "spectrum" } });
       break;
   }
+};
+
+const getPng = () => {
+  downloadImage(viewer.value.pngURI(), name.value + '-' + style.value + '.png');
 }
+
+const getPdb = () => {
+  if (hasPdb.value == true) {
+    downloadPdb(pdb.value, name.value + '-' + style.value + '.pdb')
+  }
+}
+
+const downloadImage = (base64String, filename) => {
+  const byteCharacters = atob(base64String.split(',')[1]);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: 'image/png' });
+  FileSaver.saveAs(blob, filename);
+};
+
+const downloadPdb = (pdbString, name) => {
+  const blob = new Blob([pdbString], { type: 'text/plain;charset=utf-8' });
+  FileSaver.saveAs(blob, name);
+};
 
 defineExpose({
   handleSelect
@@ -77,18 +119,19 @@ defineExpose({
  * clickable参数是可选的，用于指定是否可以单击。
  * callback参数是可选的，用于指定回调函数。
  */
-const render = (options) => {
+const render = (v, options) => {
   axios
     .get(pdbUri)
     .then((response) => {
-      let v = $3Dmol.createViewer(document.getElementsByClassName("mol-container")[0]);
+      hasPdb.value = true;
+      pdb.value = response.data;
       v.addModel(response.data, "pdb"); /* load data */
       v.setBackgroundColor('#E4E5EA');
-      v.container.style.borderRadius = '10%';
+      // v.container.style.borderRadius = '10%';
       // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
       v.setStyle({}, options); /* style all atoms */
-      // v.container.style.width = '500px';
-      // v.container.style.height = '500px';
+      v.container.style.width = `100%`;
+      v.container.style.height = `calc(90% - 5px)`;
       v.zoomTo(); /* set camera */
       v.render(); /* render scene */
       v.zoom(1.1, 500); /* slight zoom */
@@ -99,20 +142,20 @@ const render = (options) => {
 }
 
 onMounted(() => {
-  render({ stick: { color: "spectrum" } })
+  viewer.value = $3Dmol.createViewer(document.getElementsByClassName("mol-container")[0])
+  render(viewer.value, { stick: { color: "spectrum" } })
 })
 
 </script>
 <style scoped>
 .root {
   margin: 0 auto;
-  width: 80%;
-  height: 60vh;
-  background-color: #E4E5EA;
-  border-radius: 20px 20px 0 0;
+  width: 100%;
+  height: 100%;
 }
 
 .head {
+  border-radius: 20px 20px 0 0;
   width: 100%;
   height: 40px;
   line-height: 40px;
@@ -121,15 +164,21 @@ onMounted(() => {
   letter-spacing: 0.05em;
   font-family: Microsoft JhengHei;
   font-weight: bold;
+  background-color: rgba(22, 93, 255, 0.9);
+  color: rgb(239, 235, 235);
+}
+
+.btn {
+  border-radius: 10px;
+  background-color: rgb(239, 235, 235);
+  font-weight: bold;
+  font-size: 1em;
+  letter-spacing: 0.05em;
 }
 
 .mol-container {
   position: relative;
   margin: 0 auto;
-  width: 100%;
-  height: calc(100% - 5px);
-  /* border-style:solid;
-    border-width:5px; */
 }
 
 .foot {
