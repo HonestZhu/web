@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "3dmol": "^2.0.2",
+    "@phylocanvas/phylocanvas.gl": "latest",
     "axios": "^1.3.4",
+    "d3": "^7.8.4",
+    "deck.gl": "^8.9.7",
     "jquery": "^3.6.4",
-    "undefined": "^undefined",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
