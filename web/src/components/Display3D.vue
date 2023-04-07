@@ -32,10 +32,14 @@
             </a-dropdown>
           </a-col>
           <a-col :span="3">
-            <a-button size="small" ref="download" class="btn" @click="getPng"><icon-file-image />导出PNG</a-button>
+            <a-button size="small" ref="download" class="btn" @click="getPng"
+              ><icon-file-image />导出PNG</a-button
+            >
           </a-col>
           <a-col :span="3">
-            <a-button size="small" ref="download" class="btn" @click="getPdb"><icon-cloud-download />导出PDB</a-button>
+            <a-button size="small" ref="download" class="btn" @click="getPdb"
+              ><icon-cloud-download />导出PDB</a-button
+            >
           </a-col>
           <a-col :span="4"></a-col>
           <a-col :span="6">{{ name }} - {{ style }}</a-col>
@@ -51,41 +55,40 @@
 
 <script setup>
 import * as $3Dmol from "3dmol";
-import FileSaver from 'file-saver';
+import FileSaver from "file-saver";
 import { ref, getCurrentInstance, onMounted, defineExpose } from "vue";
 import SelectColor from "./SelectColor.vue";
 import axios from "axios";
 
 let pdbUri = "../../public/data/1AKI_clean.pdb";
 const viewer = ref(null);
-let name = ref('1AKI_clean.pdb');
-let style = ref('粘性键');
+let name = ref("1AKI_clean.pdb");
+let style = ref("粘性键");
 let hasPdb = ref(false);
-let pdb = ref('');
+let pdb = ref("");
 let download = ref(null);
 
 const visible = ref(false);
-const selectedColor = ref('#000000');
-const color = ref('#E4E5EA');
-
+const selectedColor = ref("#000000");
+const color = ref("#E4E5EA");
 
 const handleSelect = (name) => {
   // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
   style.value = name;
   switch (name) {
-    case '粘性键':
+    case "粘性键":
       render(viewer.value, { stick: { color: "spectrum" } });
       break;
-    case '球形':
+    case "球形":
       render(viewer.value, { sphere: { color: "spectrum" } });
       break;
-    case '卡通':
+    case "卡通":
       render(viewer.value, { cartoon: { color: "spectrum" } });
       break;
-    case '线':
+    case "线":
       render(viewer.value, { line: { color: "spectrum" } });
       break;
-    case '十字形':
+    case "十字形":
       render(viewer.value, { cross: { color: "spectrum" } });
       break;
   }
@@ -94,46 +97,46 @@ const handleSelect = (name) => {
 const handleSelectColor = (name) => {
   let v = viewer.value;
   switch (name) {
-    case '默认':
-      color.value = '#E4E5EA';
+    case "默认":
+      color.value = "#E4E5EA";
       break;
-    case '黑色':
-      color.value = 'black';
+    case "黑色":
+      color.value = "black";
       break;
-    case '白色':
-      color.value = 'white';
+    case "白色":
+      color.value = "white";
       break;
   }
   v.setBackgroundColor(color.value);
-}
+};
 
 const getPng = () => {
-  downloadImage(viewer.value.pngURI(), name.value + '-' + style.value + '.png');
+  downloadImage(viewer.value.pngURI(), name.value + "-" + style.value + ".png");
 };
 const getPdb = () => {
   if (hasPdb.value == true) {
-    downloadPdb(pdb.value, name.value + '-' + style.value + '.pdb')
+    downloadPdb(pdb.value, name.value + "-" + style.value + ".pdb");
   }
 };
 const downloadImage = (base64String, filename) => {
-  const byteCharacters = atob(base64String.split(',')[1]);
+  const byteCharacters = atob(base64String.split(",")[1]);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
     byteNumbers[i] = byteCharacters.charCodeAt(i);
   }
   const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: 'image/png' });
+  const blob = new Blob([byteArray], { type: "image/png" });
   FileSaver.saveAs(blob, filename);
 };
 const downloadPdb = (pdbString, name) => {
-  const blob = new Blob([pdbString], { type: 'text/plain;charset=utf-8' });
+  const blob = new Blob([pdbString], { type: "text/plain;charset=utf-8" });
   FileSaver.saveAs(blob, name);
 };
 
 defineExpose({
   handleSelect,
-  handleSelectColor
-})
+  handleSelectColor,
+});
 
 /**
  * setStyle函数是3Dmol.js中的一个函数，用于设置分子的样式。
@@ -149,34 +152,42 @@ defineExpose({
  * clickable参数是可选的，用于指定是否可以单击。
  * callback参数是可选的，用于指定回调函数。
  */
-const render = (v, options) => {
-  axios
-    .get(pdbUri)
-    .then((response) => {
-      hasPdb.value = true;
-      pdb.value = response.data;
-      v.addModel(response.data, "pdb"); /* load data */
-      v.setBackgroundColor('#E4E5EA');
-      // v.container.style.borderRadius = '10%';
-      // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
-      v.setStyle({}, options); /* style all atoms */
-      v.container.style.width = `100%`;
-      v.container.style.height = `calc(90% - 5px)`;
-      v.zoomTo(); /* set camera */
-      v.render(); /* render scene */
-      v.setBackgroundColor(color.value);
-      v.zoom(1.1, 500); /* slight zoom */
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-}
+const render = (v, options, url) => {
+  if (url != null) {
+    axios
+      .get(url)
+      .then((response) => {
+        hasPdb.value = true;
+        pdb.value = response.data;
+        v.addModel(response.data, "pdb"); /* load data */
+        v.setBackgroundColor("#E4E5EA");
+        // v.container.style.borderRadius = '10%';
+        // stick: 粘性键 sphere: 球形 cartoon: 卡通 line: 线 cross: 十字形 dot: 点
+        v.setStyle({}, options); /* style all atoms */
+        v.container.style.width = `100%`;
+        v.container.style.height = `calc(90% - 5px)`;
+        v.zoomTo(); /* set camera */
+        v.render(); /* render scene */
+        v.zoom(1.1, 500); /* slight zoom */
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } else {
+    v.setStyle({}, options); /* style all atoms */
+    v.render(); /* render scene */
+    v.zoomTo(); /* set camera */
+    v.render(); /* render scene */
+    v.zoom(1.1, 500); /* slight zoom */
+  }
+};
 
 onMounted(() => {
-  viewer.value = $3Dmol.createViewer(document.getElementsByClassName("mol-container")[0])
-  render(viewer.value, { stick: { color: "spectrum" } })
-})
-
+  viewer.value = $3Dmol.createViewer(
+    document.getElementsByClassName("mol-container")[0]
+  );
+  render(viewer.value, { stick: { color: "spectrum" } }, pdbUri);
+});
 </script>
 <style scoped>
 .root {
@@ -203,7 +214,7 @@ onMounted(() => {
 .btn {
   padding: 10px;
   border-radius: 10px;
-  background-color: #E4E5EA;
+  background-color: #e4e5ea;
   font-weight: bold;
   font-size: 0.9em;
 }
